@@ -65,7 +65,7 @@ Nightly wheel installation
     issues during development. If you encounter any bugs, please report them.
 
 Snapshot wheels of current Kivy master are created every night. They can be found
-`here <https://drive.google.com/folderview?id=0B1_HB9J8mZepOV81UHpDbmg5SWM&usp=sharing>`_.
+`here <https://drive.google.com/folderview?id=0B1_HB9J8mZepOV81UHpDbmg5SWM&usp=sharing#list>`_.
 To use them, instead of doing `python -m pip install kivy` we'll install one of
 these wheels as follows.
 
@@ -186,7 +186,7 @@ with git rather than a wheel there are some additional steps:
 #. If you downloaded or cloned kivy to an alternate location and don't want to
    install it to site-packages read the next section.
 #. Finally compile and install kivy with ``pip install filename``, where ``filename``
-   can be a url such as ``https://github.com/kivy/kivy/archive/deps.zip`` for
+   can be a url such as ``https://github.com/kivy/kivy/archive/master.zip`` for
    kivy master, or the full path to a local copy of a kivy zip.
 
 .. _alternate-win:

@@ -132,3 +132,7 @@ Alternatively you can install Kivy using the following steps:
 
         $ pip install -I Cython==0.23
         $ USE_OSX_FRAMEWORKS=0 pip install kivy
+
+    - To install the development version, use this in the second step::
+
+        $ USE_OSX_FRAMEWORKS=0 pip install https://github.com/kivy/kivy/archive/master.zip

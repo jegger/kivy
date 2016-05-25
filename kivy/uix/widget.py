@@ -34,7 +34,7 @@ This widget class was designed with a couple of principles in mind:
   If a simple AABB is not sufficient, you can override the method to
   perform the collision checks with more complex shapes, e.g. a polygon.
   You can also check if a widget collides with another widget with
-  :meth:`Widget.collide_widget`.
+  :meth:`~Widget.collide_widget`.
 
 
 We also have some default values and behaviors that you should be aware of:
@@ -52,9 +52,9 @@ We also have some default values and behaviors that you should be aware of:
 * The default size_hint is (1, 1). If the parent is a :class:`Layout`, then the
   widget size will be the parent layout's size.
 
-* :meth:`Widget.on_touch_down`, :meth:`Widget.on_touch_move`,
-  :meth:`Widget.on_touch_up` don't do any sort of collisions. If you want to
-  know if the touch is inside your widget, use :meth:`Widget.collide_point`.
+* :meth:`~Widget.on_touch_down`, :meth:`~Widget.on_touch_move`,
+  :meth:`~Widget.on_touch_up` don't do any sort of collisions. If you want to
+  know if the touch is inside your widget, use :meth:`~Widget.collide_point`.
 
 Using Properties
 ----------------
@@ -121,7 +121,8 @@ When you catch touch events between multiple widgets, you often
 need to be aware of the order in which these events are propogated. In Kivy,
 events bubble up from the most recently added widget and then backwards through
 its children (from the most recently added back to the first child). This order
-is the same for the `on_touch_move` and `on_touch_up` events.
+is the same for the :meth:`~kivy.uix.widget.Widget.on_touch_move` and
+:meth:`~kivy.uix.widget.Widget.on_touch_up` events.
 
 If you want to reverse this order, you can raise events in the children before
 the parent by using the `super` command. For example:
@@ -470,9 +471,9 @@ class Widget(WidgetBase):
             `index`: int, defaults to 0
                 Index to insert the widget in the list. Notice that the default
                 of 0 means the widget is inserted at the beginning of the list
-                and will thus appear under the other widgets. For a full
-                discussion on the index and widget hierarchy, please see the
-                :doc:`Widgets Programming Guide <guide/widgets>`.
+                and will thus be drawn on top of other sibling widgets. For a
+                full discussion of the index and widget hierarchy, please see
+                the :doc:`Widgets Programming Guide <guide/widgets>`.
 
                 .. versionadded:: 1.0.5
             `canvas`: str, defaults to None
