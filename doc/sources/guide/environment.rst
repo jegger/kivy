@@ -65,7 +65,7 @@ KIVY_USE_DEFAULTCONFIG
     If this name is found in environ, Kivy will not read the user config file.
 
 KIVY_NO_CONFIG
-    If set, no configuration file will be read or writen to. This also applies
+    If set, no configuration file will be read or written to. This also applies
     to the user configuration directory.
 
 KIVY_NO_FILELOG
@@ -105,12 +105,12 @@ KIVY_TEXT
 KIVY_VIDEO
     Implementation to use for rendering video
 
-    Values: pygst, gstplayer, pyglet, ffpyplayer, null
+    Values: pygst, gstplayer, pyglet, ffpyplayer, ffmpeg, gi, null
 
 KIVY_AUDIO
     Implementation to use for playing audio
 
-    Values: sdl2, gstplayer, pygst, ffpyplayer, pygame
+    Values: sdl2, gstplayer, pygst, ffpyplayer, pygame, gi, avplayer
 
 KIVY_IMAGE
     Implementation to use for reading image
