@@ -38,7 +38,8 @@ For example, this label's size will be set to the text content
     Label:
         size: self.texture_size
 
-This label's text will wrap at the specified width and be clipped to the height:
+This label's text will wrap at the specified width and be clipped to the
+height:
 
 .. code-block:: kv
 
@@ -65,8 +66,8 @@ properties to control the alignment of its text. However, by default the text
 image (:attr:`~Label.texture`) is only just large enough to contain the
 characters and is positioned in the center of the Label. The valign property
 will have no effect and halign will only have an effect if your text has
-newlines; a single line of text will appear to be centered even though halign is
-set to left (by default).
+newlines; a single line of text will appear to be centered even though halign
+is set to left (by default).
 
 In order for the alignment properties to take effect, set the
 :attr:`~Label.text_size`, which specifies the size of the bounding box within
@@ -242,7 +243,7 @@ __all__ = ('Label', )
 
 from kivy.clock import Clock
 from kivy.uix.widget import Widget
-from kivy.core.text import Label as CoreLabel
+from kivy.core.text import Label as CoreLabel, DEFAULT_FONT
 from kivy.core.text.markup import MarkupLabel as CoreMarkupLabel
 from kivy.properties import StringProperty, OptionProperty, \
     NumericProperty, BooleanProperty, ReferenceListProperty, \
@@ -262,9 +263,9 @@ class Label(Widget):
     __events__ = ['on_ref_press']
 
     _font_properties = ('text', 'font_size', 'font_name', 'bold', 'italic',
-                        'underline', 'strikethrough', 'color', 'disabled_color',
-                        'halign', 'valign', 'padding_x', 'padding_y',
-                        'outline_width', 'disabled_outline_color',
+                        'underline', 'strikethrough', 'color',
+                        'disabled_color', 'halign', 'valign', 'padding_x',
+                        'padding_y', 'outline_width', 'disabled_outline_color',
                         'outline_color', 'text_size', 'shorten', 'mipmap',
                         'line_height', 'max_lines', 'strip', 'shorten_from',
                         'split_str', 'ellipsis_options', 'unicode_errors',
@@ -340,9 +341,11 @@ class Label(Widget):
         mrkup = self._label.__class__ is CoreMarkupLabel
         self.texture = None
 
-        if (not self._label.text or (self.halign == 'justify' or self.strip)
-                and not self._label.text.strip()):
+        if (not self._label.text or
+                (self.halign == 'justify' or self.strip) and
+                not self._label.text.strip()):
             self.texture_size = (0, 0)
+            self.is_shortened = False
             if mrkup:
                 self.refs, self._label._refs = {}, {}
                 self.anchors, self._label._anchors = {}, {}
@@ -371,6 +374,7 @@ class Label(Widget):
             if texture is not None:
                 self.texture = self._label.texture
                 self.texture_size = list(self.texture.size)
+            self.is_shortened = self._label.is_shortened
 
     def on_touch_down(self, touch):
         if super(Label, self).on_touch_down(touch):
@@ -448,7 +452,7 @@ class Label(Widget):
     defaults to (None, None), meaning no size restriction by default.
     '''
 
-    font_name = StringProperty('Roboto')
+    font_name = StringProperty(DEFAULT_FONT)
     '''Filename of the font to use. The path can be absolute or relative.
     Relative paths are resolved by the :func:`~kivy.resources.resource_find`
     function.
@@ -467,7 +471,8 @@ class Label(Widget):
         .. |unicodechar| image:: images/unicode-char.png
 
     :attr:`font_name` is a :class:`~kivy.properties.StringProperty` and
-    defaults to 'Roboto'.
+    defaults to 'Roboto'. This value is taken
+    from :class:`~kivy.config.Config`.
     '''
 
     font_size = NumericProperty('15sp')
@@ -517,10 +522,10 @@ class Label(Widget):
     .. note::
         This feature requires the SDL2 text provider.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
 
-    :attr:`underline` is a :class:`~kivy.properties.BooleanProperty` and defaults
-    to False.
+    :attr:`underline` is a :class:`~kivy.properties.BooleanProperty` and
+    defaults to False.
     '''
 
     strikethrough = BooleanProperty(False)
@@ -529,10 +534,10 @@ class Label(Widget):
     .. note::
         This feature requires the SDL2 text provider.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
 
-    :attr:`strikethrough` is a :class:`~kivy.properties.BooleanProperty` and defaults
-    to False.
+    :attr:`strikethrough` is a :class:`~kivy.properties.BooleanProperty` and
+    defaults to False.
     '''
 
     padding_x = NumericProperty(0)
@@ -591,7 +596,7 @@ class Label(Widget):
     to 'bottom'. Available options are : `'bottom'`,
     `'middle'` (or `'center'`) and `'top'`.
 
-    .. versionchanged:: 1.9.2
+    .. versionchanged:: 1.10.0
         The `'center'` option has been added as an alias of `'middle'`.
 
     .. warning::
@@ -616,7 +621,7 @@ class Label(Widget):
     .. note::
         This feature requires the SDL2 text provider.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
 
     :attr:`outline_width` is a :class:`~kivy.properties.NumericProperty` and
     defaults to None.
@@ -628,7 +633,7 @@ class Label(Widget):
     .. note::
         This feature requires the SDL2 text provider.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
 
     :attr:`outline_color` is a :class:`~kivy.properties.ListProperty` and
     defaults to [0, 0, 0].
@@ -641,7 +646,7 @@ class Label(Widget):
     .. note::
         This feature requires the SDL2 text provider.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
 
     :attr:`disabled_outline_color` is a :class:`~kivy.properties.ListProperty`
     and defaults to [0, 0, 0].
@@ -733,6 +738,16 @@ class Label(Widget):
     defaults to `center`.
     '''
 
+    is_shortened = BooleanProperty(False)
+    '''This property indicates if :attr:`text` was rendered with or without
+    shortening when :attr:`shorten` is True.
+
+    .. versionadded:: 1.10.0
+
+    :attr:`is_shortened` is a :class:`~kivy.properties.BooleanProperty` and
+    defaults to False.
+    '''
+
     split_str = StringProperty('')
     '''The string used to split the :attr:`text` while shortening the string
     when :attr:`shorten` is True.
@@ -811,9 +826,9 @@ class Label(Widget):
 
     The references marked "hello" have a bounding box at (x1, y1, x2, y2).
     These co-ordinates are relative to the top left corner of the text, with
-    the y value increasing downwards. You can define multiple refs with the same
-    name: each occurrence will be added as another (x1, y1, x2, y2) tuple to
-    this list.
+    the y value increasing downwards. You can define multiple refs with the
+    same name: each occurrence will be added as another (x1, y1, x2, y2) tuple
+    to this list.
 
     The current Label implementation uses these references if they exist in
     your markup text, automatically doing the collision with the touch and
@@ -895,7 +910,7 @@ class Label(Widget):
     .. note::
         This feature requires the SDL2 text provider.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
 
     :attr:`font_hinting` is an :class:`~kivy.properties.OptionProperty` and
     defaults to `'normal'`.
@@ -907,7 +922,7 @@ class Label(Widget):
     .. note::
         This feature requires the SDL2 text provider.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
 
     :attr:`font_kerning` is a :class:`~kivy.properties.BooleanProperty` and
     defaults to True.
@@ -919,7 +934,7 @@ class Label(Widget):
     .. note::
         This feature requires the SDL2 text provider.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
 
     :attr:`font_blended` is a :class:`~kivy.properties.BooleanProperty` and
     defaults to True.

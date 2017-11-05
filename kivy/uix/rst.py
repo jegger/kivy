@@ -10,12 +10,13 @@ system.
 
 .. note::
 
-    This widget requires ``docutils`` package to run. Install it with ``pip``.
+    This widget requires the ``docutils`` package to run. Install it with
+    ``pip`` or include it as one of your deployment requirements.
 
 .. warning::
 
-    This widget is highly experimental. The whole styling and
-    implementation are not stable until this warning has been removed.
+    This widget is highly experimental. The styling and implementation should
+    not be considered stable until this warning has been removed.
 
 Usage with Text
 ---------------
@@ -43,11 +44,11 @@ The rendering will output:
 Usage with Source
 -----------------
 
-You can also render a rst file using the :attr:`RstDocument.source` property::
+You can also render a rst file using the :attr:`~RstDocument.source` property::
 
     document = RstDocument(source='index.rst')
 
-You can reference other documents with the role ``:doc:``. For example, in the
+You can reference other documents using the role ``:doc:``. For example, in the
 document ``index.rst`` you can write::
 
     Go to my next document: :doc:`moreinfo.rst`
@@ -657,11 +658,11 @@ class RstDocument(ScrollView):
         # get the anchor coordinate inside widget space
         ax += node.x
         ay = node.top - ay
-        #ay += node.y
+        # ay += node.y
 
         # what's the current coordinate for us?
         sx, sy = self.scatter.x, self.scatter.top
-        #ax, ay = self.scatter.to_parent(ax, ay)
+        # ax, ay = self.scatter.to_parent(ax, ay)
 
         ay -= self.height
 
@@ -838,6 +839,7 @@ class _Visitor(nodes.NodeVisitor):
         self.text_have_anchor = False
         self.section = 0
         self.do_strip_text = False
+        self.substitution = {}
         nodes.NodeVisitor.__init__(self, *largs)
 
     def push(self, widget):
@@ -852,16 +854,39 @@ class _Visitor(nodes.NodeVisitor):
         if cls is nodes.document:
             self.push(self.root.content)
 
+        elif cls is nodes.comment:
+            return
+
         elif cls is nodes.section:
             self.section += 1
+
+        elif cls is nodes.substitution_definition:
+            name = node.attributes['names'][0]
+            self.substitution[name] = node.children[0]
+
+        elif cls is nodes.substitution_reference:
+            node = self.substitution[node.attributes['refname']]
+            self.text += node
 
         elif cls is nodes.title:
             label = RstTitle(section=self.section, document=self.root)
             self.current.add_widget(label)
             self.push(label)
-            #assert(self.text == '')
+            # assert(self.text == '')
 
         elif cls is nodes.Text:
+            # check if parent isn't a special directive
+            if hasattr(node, 'parent'):
+                if node.parent.tagname == 'substitution_definition':
+                    # .. |ref| replace:: something
+                    return
+                elif node.parent.tagname == 'substitution_reference':
+                    # |ref|
+                    return
+                elif node.parent.tagname == 'comment':
+                    # .. COMMENT
+                    return
+
             if self.do_strip_text:
                 node = node.replace('\n', ' ')
                 node = node.replace('  ', ' ')
@@ -946,17 +971,38 @@ class _Visitor(nodes.NodeVisitor):
             assert(self.text == '')
 
         elif cls is nodes.image:
+            # docutils parser breaks path with spaces
+            # e.g. "C:/my path" -> "C:/mypath"
             uri = node['uri']
+            align = node.get('align', 'center')
+            image_size = [
+                node.get('width'),
+                node.get('height')
+            ]
+
+            # use user's size if defined
+            def set_size(img, size):
+                img.size = [
+                    size[0] or img.width,
+                    size[1] or img.height
+                ]
+
             if uri.startswith('/') and self.root.document_root:
                 uri = join(self.root.document_root, uri[1:])
+
             if uri.startswith('http://') or uri.startswith('https://'):
                 image = RstAsyncImage(source=uri)
+                image.bind(on_load=lambda *a: set_size(image, image_size))
             else:
                 image = RstImage(source=uri)
+                set_size(image, image_size)
 
-            align = node.get('align', 'center')
-            root = AnchorLayout(size_hint_y=None, anchor_x=align,
-                                height=image.height)
+            root = AnchorLayout(
+                size_hint_y=None,
+                anchor_x=align,
+                height=image.height
+            )
+
             image.bind(height=root.setter('height'))
             root.add_widget(image)
             self.current.add_widget(root)
@@ -1183,6 +1229,7 @@ class _Visitor(nodes.NodeVisitor):
         return '[color=%s]%s[/color]' % (
             self.root.colors.get(name, self.root.colors['paragraph']),
             text)
+
 
 if __name__ == '__main__':
     from kivy.base import runTouchApp

@@ -21,7 +21,7 @@ by many projects managed by the [Kivy Organization](https://kivy.org/#organizati
 
 [![Coverage Status](https://coveralls.io/repos/kivy/kivy/badge.svg?branch=master)](https://coveralls.io/r/kivy/kivy?branch=master)
 [![Build Status](https://travis-ci.org/kivy/kivy.svg?branch=master)](https://travis-ci.org/kivy/kivy)
-[![Build status](https://ci.appveyor.com/api/projects/status/pkmu22lyw4i2bscy/branch/master?svg=true)](https://ci.appveyor.com/project/matham/kivy/branch/master)
+[![Build status](https://ci.appveyor.com/api/projects/status/sqc46n4a3bq2gj1s/branch/master?svg=true)](https://ci.appveyor.com/project/KivyOrg/kivy/branch/master)
 [![Bountysource](https://www.bountysource.com/badge/tracker?tracker_id=42681)](https://www.bountysource.com/trackers/42681-kivy?utm_source=42681&utm_medium=shield&utm_campaign=TRACKER_BADGE)
 
 Installation, Documentation and Examples
@@ -43,9 +43,10 @@ If you need assistance, you can ask for help on our mailing list:
 
 We also have an IRC channel:
 
-* Server  : irc.freenode.net
-* Port    : 6667, 6697 (SSL only)
-* Channel : #kivy
+* Server     : irc.freenode.net
+* Port       : 6667, 6697 (SSL only)
+* Channel    : #kivy
+* Web client : [WebChat](https://webchat.freenode.net/?nick=kvuser.&channels=kivy&uio=d4)
 
 Contributing
 ------------
@@ -62,9 +63,10 @@ discussions about developing the Kivy framework and its sister projects:
 
 IRC channel:
 
-* Server  : irc.freenode.net
-* Port    : 6667, 6697 (SSL only)
-* Channel : #kivy-dev
+* Server     : irc.freenode.net
+* Port       : 6667, 6697 (SSL only)
+* Channel    : #kivy-dev
+* Web client : [WebChat](https://webchat.freenode.net/?nick=kvuser.&channels=kivy-dev&uio=d4)
 
 Sister projects
 ---------------
@@ -97,7 +99,7 @@ Licenses
   distributed under the terms of the
   [Apache License, Version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
   The DejaVuSans (used for the virtual keyboard) license can be viewed
-  [here](http://dejavu-fonts.org/wiki/License).
+  [here](https://github.com/dejavu-fonts/dejavu-fonts/blob/master/LICENSE).
 - The current UI design has been adapted from Moblintouch theme's SVGs
   and is licensed under the terms of the
   [LGPLv2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1).

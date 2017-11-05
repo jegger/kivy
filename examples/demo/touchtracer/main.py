@@ -41,7 +41,7 @@ def calculate_points(x1, y1, x2, y2, steps=5):
     dy = y2 - y1
     dist = sqrt(dx * dx + dy * dy)
     if dist < steps:
-        return None
+        return
     o = []
     m = dist / steps
     for i in range(1, int(m)):
@@ -150,6 +150,7 @@ class TouchtracerApp(App):
 
     def on_pause(self):
         return True
+
 
 if __name__ == '__main__':
     TouchtracerApp().run()

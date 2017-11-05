@@ -61,8 +61,7 @@ settings. Here is an example::
             "title": "Fullscreen",
             "desc": "Set the window in windowed or fullscreen",
             "section": "graphics",
-            "key": "fullscreen",
-            "true": "auto"
+            "key": "fullscreen"
         }
     ]
 
@@ -453,7 +452,7 @@ class SettingPath(SettingItem):
     :attr:`show_hidden` is an :class:`~kivy.properties.BooleanProperty` and
     defaults to False.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
     '''
 
     dirselect = BooleanProperty(True)
@@ -462,7 +461,7 @@ class SettingPath(SettingItem):
     :attr:`dirselect` is a :class:`~kivy.properties.BooleanProperty` and
     defaults to True.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
     '''
 
     def on_panel(self, instance, value):
@@ -997,7 +996,7 @@ class Settings(BoxLayout):
 
         for setting in data:
             # determine the type and the class to use
-            if not 'type' in setting:
+            if 'type' not in setting:
                 raise ValueError('One setting are missing the "type" element')
             ttype = setting['type']
             cls = self._types.get(ttype)

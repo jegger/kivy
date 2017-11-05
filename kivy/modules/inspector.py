@@ -243,11 +243,11 @@ class TreeViewProperty(BoxLayout, TreeViewNode):
     def _get_widget(self):
         wr = self.widget_ref
         if wr is None:
-            return None
+            return
         wr = wr()
         if wr is None:
             self.widget_ref = None
-            return None
+            return
         return wr
     widget = AliasProperty(_get_widget, None, bind=('widget_ref', ))
 
@@ -280,7 +280,7 @@ class WidgetTree(TreeView):
                     return node
             except ReferenceError:
                 pass
-        return None
+        return
 
     def update_selected_widget(self, widget):
         if widget:
@@ -352,8 +352,8 @@ class Inspector(FloatLayout):
 
     def on_touch_down(self, touch):
         ret = super(Inspector, self).on_touch_down(touch)
-        if (('button' not in touch.profile or touch.button == 'left')
-                and not ret and self.inspect_enabled):
+        if (('button' not in touch.profile or touch.button == 'left') and
+                not ret and self.inspect_enabled):
             self.highlight_at(*touch.pos)
             if touch.is_double_tap:
                 self.inspect_enabled = False
@@ -388,7 +388,7 @@ class Inspector(FloatLayout):
         # modalviews before others
         win_children = self.win.children
         children = chain(
-            (c for c in reversed(win_children) if isinstance(c, ModalView)),
+            (c for c in win_children if isinstance(c, ModalView)),
             (c for c in reversed(win_children) if not isinstance(c, ModalView))
         )
         for child in children:

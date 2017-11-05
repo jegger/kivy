@@ -96,14 +96,14 @@ class TuioMotionEventProvider(MotionEventProvider):
             Logger.error('Tuio: Format must be ip:port (eg. 127.0.0.1:3333)')
             err = 'Tuio: Current configuration is <%s>' % (str(','.join(args)))
             Logger.error(err)
-            return None
+            return
         ipport = args[0].split(':')
         if len(ipport) != 2:
             Logger.error('Tuio: Invalid configuration for TUIO provider')
             Logger.error('Tuio: Format must be ip:port (eg. 127.0.0.1:3333)')
             err = 'Tuio: Current configuration is <%s>' % (str(','.join(args)))
             Logger.error(err)
-            return None
+            return
         self.ip, self.port = args[0].split(':')
         self.port = int(self.port)
         self.handlers = {}
@@ -188,10 +188,10 @@ class TuioMotionEventProvider(MotionEventProvider):
             alives = args[1:]
             to_delete = []
             for id in self.touches[oscpath]:
-                if not id in alives:
+                if id not in alives:
                     # touch up
                     touch = self.touches[oscpath][id]
-                    if not touch in to_delete:
+                    if touch not in to_delete:
                         to_delete.append(touch)
 
             for touch in to_delete:

@@ -327,13 +327,13 @@ class ImageLoader(object):
         image = None
         for zfilename in znamelist:
             try:
-                #read file and store it in mem with fileIO struct around it
+                # read file and store it in mem with fileIO struct around it
                 tmpfile = BytesIO(z.read(zfilename))
                 ext = zfilename.split('.')[-1].lower()
                 im = None
                 for loader in ImageLoader.loaders:
-                    if (ext not in loader.extensions()
-                        or not loader.can_load_memory()):
+                    if (ext not in loader.extensions() or
+                            not loader.can_load_memory()):
                         continue
                     Logger.debug('Image%s: Load <%s> from <%s>' %
                                  (loader.__name__[11:], zfilename, filename))
@@ -349,7 +349,7 @@ class ImageLoader(object):
                     # overwritten
                     image_data.append(im._data[0])
                     image = im
-                #else: if not image file skip to next
+                # else: if not image file skip to next
             except:
                 Logger.warning('Image: Unable to load image'
                                '<%s> in zip <%s> trying to continue...'
@@ -935,7 +935,7 @@ image_libs += [
 libs_loaded = core_register_libs('image', image_libs)
 
 from os import environ
-if not 'KIVY_DOC' in environ and not libs_loaded:
+if 'KIVY_DOC' not in environ and not libs_loaded:
     import sys
 
     Logger.critical('App: Unable to get any Image provider, abort.')

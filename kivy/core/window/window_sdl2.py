@@ -16,6 +16,7 @@ TODO:
 __all__ = ('WindowSDL2', )
 
 from os.path import join
+import sys
 from kivy import kivy_data_dir
 from kivy.logger import Logger
 from kivy.base import EventLoop, ExceptionManager, stopTouchApp
@@ -185,6 +186,8 @@ class WindowSDL(WindowBase):
         self.bind(minimum_width=self._set_minimum_size,
                   minimum_height=self._set_minimum_size)
 
+        self.bind(allow_screensaver=self._set_allow_screensaver)
+
     def _set_minimum_size(self, *args):
         minimum_width = self.minimum_width
         minimum_height = self.minimum_height
@@ -194,6 +197,9 @@ class WindowSDL(WindowBase):
             Logger.warning(
                 'Both Window.minimum_width and Window.minimum_height must be '
                 'bigger than 0 for the size restriction to take effect.')
+
+    def _set_allow_screensaver(self, *args):
+        self._win.set_allow_screensaver(self.allow_screensaver)
 
     def _event_filter(self, action):
         from kivy.app import App
@@ -213,7 +219,8 @@ class WindowSDL(WindowBase):
                 return 0
 
             if not app.dispatch('on_pause'):
-                Logger.info('WindowSDL: App doesn\'t support pause mode, stop.')
+                Logger.info(
+                    'WindowSDL: App doesn\'t support pause mode, stop.')
                 stopTouchApp()
                 return 0
 
@@ -271,6 +278,7 @@ class WindowSDL(WindowBase):
             # will be fired.
             self._pos = (0, 0)
             self._set_minimum_size()
+            self._set_allow_screensaver()
 
             if state == 'hidden':
                 self._focus = False
@@ -378,12 +386,71 @@ class WindowSDL(WindowBase):
         self._win.flip()
         super(WindowSDL, self).flip()
 
+    def set_system_cursor(self, cursor_name):
+        result = self._win.set_system_cursor(cursor_name)
+        return result
+
+    def _get_window_pos(self):
+        return self._win.get_window_pos()
+
+    def _set_window_pos(self, x, y):
+        self._win.set_window_pos(x, y)
+
+    # Transparent Window background
+    def _is_shaped(self):
+        return self._win.is_window_shaped()
+
+    def _set_shape(self, shape_image, mode='default',
+                   cutoff=False, color_key=None):
+        modes = ('default', 'binalpha', 'reversebinalpha', 'colorkey')
+        color_key = color_key or (0, 0, 0, 1)
+        if mode not in modes:
+            Logger.warning(
+                'Window: shape mode can be only '
+                '{}'.format(', '.join(modes))
+            )
+            return
+        if not isinstance(color_key, (tuple, list)):
+            return
+        if len(color_key) not in (3, 4):
+            return
+        if len(color_key) == 3:
+            color_key = (color_key[0], color_key[1], color_key[2], 1)
+            Logger.warning(
+                'Window: Shape color_key must be only tuple or list'
+            )
+            return
+        color_key = (
+            color_key[0] * 255,
+            color_key[1] * 255,
+            color_key[2] * 255,
+            color_key[3] * 255
+        )
+
+        assert cutoff in (1, 0)
+        shape_image = shape_image or Config.get('kivy', 'window_shape')
+        shape_image = resource_find(shape_image) or shape_image
+        self._win.set_shape(shape_image, mode, cutoff, color_key)
+
+    def _get_shaped_mode(self):
+        return self._win.get_shaped_mode()
+
+    def _set_shaped_mode(self, value):
+        self._set_shape(
+            shape_image=self.shape_image,
+            mode=value, cutoff=self.shape_cutoff,
+            color_key=self.shape_color_key
+        )
+        return self._win.get_shaped_mode()
+    # twb end
+
     def _set_cursor_state(self, value):
         self._win._set_cursor_state(value)
 
     def _fix_mouse_pos(self, x, y):
         y -= 1
-        self.mouse_pos = x * self._density, (self.system_size[1] - y) * self._density
+        self.mouse_pos = (x * self._density,
+                          (self.system_size[1] - y) * self._density)
         return x, y
 
     def _mainloop(self):
@@ -398,7 +465,15 @@ class WindowSDL(WindowBase):
             self._win.wait_event()
             if not self._pause_loop:
                 break
-            self._win.poll()
+            event = self._win.poll()
+            if event is None:
+                continue
+            # As dropfile is send was the app is still in pause.loop
+            # we need to dispatch it
+            action, args = event[0], event[1:]
+            if action == 'dropfile':
+                dropfile = args
+                self.dispatch('on_dropfile', dropfile[0])
 
         while True:
             event = self._win.poll()
@@ -466,9 +541,9 @@ class WindowSDL(WindowBase):
 
                 self._mouse_meta = self.modifiers
                 self._mouse_btn = btn
-                #times = x if y == 0 else y
-                #times = min(abs(times), 100)
-                #for k in range(times):
+                # times = x if y == 0 else y
+                # times = min(abs(times), 100)
+                # for k in range(times):
                 self._mouse_down = True
                 self.dispatch('on_mouse_down',
                     self._mouse_x, self._mouse_y, btn, self.modifiers)
@@ -485,12 +560,10 @@ class WindowSDL(WindowBase):
                 # don't use trigger here, we want to delay the resize event
                 ev = self._do_resize_ev
                 if ev is None:
-                    ev = self._do_resize_ev = Clock.schedule_once(self._do_resize, .1)
+                    ev = Clock.schedule_once(self._do_resize, .1)
+                    self._do_resize_ev = ev
                 else:
                     ev()
-
-            elif action == 'windowresized':
-                self.canvas.ask_update()
 
             elif action == 'windowrestored':
                 self.dispatch('on_restore')
@@ -552,17 +625,27 @@ class WindowSDL(WindowBase):
                 if action == 'keydown':
                     self._update_modifiers(mod, key)
                 else:
-                    self._update_modifiers(mod)  # ignore the key, it
-                                                 # has been released
+                    # ignore the key, it has been released
+                    self._update_modifiers(mod)
 
                 # if mod in self._meta_keys:
                 if (key not in self._modifiers and
-                    key not in self.command_keys.keys()):
+                        key not in self.command_keys.keys()):
                     try:
-                        kstr = unichr(key)
+                        kstr_chr = unichr(key)
+                        try:
+                            # On android, there is no 'encoding' attribute.
+                            # On other platforms, if stdout is redirected,
+                            # 'encoding' may be None
+                            encoding = getattr(sys.stdout, 'encoding',
+                                               'utf8') or 'utf8'
+                            kstr_chr.encode(encoding)
+                            kstr = kstr_chr
+                        except UnicodeError:
+                            pass
                     except ValueError:
                         pass
-                #if 'shift' in self._modifiers and key\
+                # if 'shift' in self._modifiers and key\
                 #        not in self.command_keys.keys():
                 #    return
 
@@ -630,7 +713,7 @@ class WindowSDL(WindowBase):
     def mainloop(self):
         # don't known why, but pygame required a resize event
         # for opengl, before mainloop... window reinit ?
-        #self.dispatch('on_resize', *self.size)
+        # self.dispatch('on_resize', *self.size)
 
         while not EventLoop.quit and EventLoop.status == 'started':
             try:

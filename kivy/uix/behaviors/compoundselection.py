@@ -88,7 +88,8 @@ to :meth:`select_with_touch` to pass on the touch events::
         def button_touch_up(self, button, touch):
             """ Use collision detection to de-select buttons when the touch
             occurs outside their area and *touch_multiselect* is not True. """
-            if not (button.collide_point(*touch.pos) or self.touch_multiselect):
+            if not (button.collide_point(*touch.pos) or
+                    self.touch_multiselect):
                 self.deselect_node(button)
 
         def select_node(self, node):
@@ -124,8 +125,17 @@ to :meth:`select_with_touch` to pass on the touch events::
 
 __all__ = ('CompoundSelectionBehavior', )
 
-from kivy.properties import NumericProperty, BooleanProperty, ListProperty
 from time import time
+from os import environ
+
+from kivy.config import Config
+from kivy.properties import NumericProperty, BooleanProperty, ListProperty
+
+
+if 'KIVY_DOC' not in environ:
+    _is_desktop = Config.getboolean('kivy', 'desktop')
+else:
+    _is_desktop = False
 
 
 class CompoundSelectionBehavior(object):
@@ -182,6 +192,16 @@ class CompoundSelectionBehavior(object):
     defaults to False.
     '''
 
+    touch_deselect_last = BooleanProperty(not _is_desktop)
+    '''Determines whether the last selected node can be deselected when
+    :attr:`multiselect` or :attr:`touch_multiselect` is False.
+
+    .. versionadded:: 1.10.0
+
+    :attr:`touch_deselect_last` is a :class:`~kivy.properties.BooleanProperty`
+    and defaults to True on mobile, False on desktop platforms.
+    '''
+
     keyboard_select = BooleanProperty(True)
     '''Determines whether the keyboard can be used for selection. If False,
     keyboard inputs will be ignored.
@@ -210,8 +230,8 @@ class CompoundSelectionBehavior(object):
 
     right_count = NumericProperty(1)
     '''Determines by how much the selected node is moved up or down, relative
-    to the position of the last selected node, when the right (or left) arrow on
-    the keyboard is pressed.
+    to the position of the last selected node, when the right (or left) arrow
+    on the keyboard is pressed.
 
     :attr:`right_count` is a :class:`~kivy.properties.NumericProperty` and
     defaults to 1.
@@ -229,7 +249,8 @@ class CompoundSelectionBehavior(object):
     nodes_order_reversed = BooleanProperty(True)
     ''' (Internal) Indicates whether the order of the nodes as displayed top-
     down is reversed compared to their order in :meth:`get_selectable_nodes`
-    (e.g. how the children property is reversed compared to how it's displayed).
+    (e.g. how the children property is reversed compared to how
+    it's displayed).
     '''
 
     text_entry_timeout = NumericProperty(1.)
@@ -238,7 +259,7 @@ class CompoundSelectionBehavior(object):
     concatenated and the combined text is passed as the key argument of
     :meth:`goto_node`.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
     '''
 
     _anchor = None  # the last anchor node selected (e.g. shift relative node)
@@ -293,7 +314,7 @@ class CompoundSelectionBehavior(object):
 
         if touch and 'button' in touch.profile and touch.button in\
             ('scrollup', 'scrolldown', 'scrollleft', 'scrollright'):
-            node_src, idx_src = self._reslove_last_node()
+            node_src, idx_src = self._resolve_last_node()
             node, idx = self.goto_node(touch.button, node_src, idx_src)
             if node == node_src:
                 return False
@@ -311,9 +332,9 @@ class CompoundSelectionBehavior(object):
             if multiselect:
                 self.deselect_node(node)
             else:
-                len_selected_node = len(self.selected_nodes)
+                selected_node_count = len(self.selected_nodes)
                 self.clear_selection()
-                if len_selected_node > 1:
+                if not self.touch_deselect_last or selected_node_count > 1:
                     self.select_node(node)
         elif range_select:
             # keep anchor only if not multiselect (ctrl-type selection)
@@ -342,15 +363,15 @@ class CompoundSelectionBehavior(object):
             return False
         keys = self._key_list
         multi = self.multiselect
-        node_src, idx_src = self._reslove_last_node()
+        node_src, idx_src = self._resolve_last_node()
         text = scancode[1]
 
         if text == 'shift':
             self._shift_down = True
         elif text in ('ctrl', 'lctrl', 'rctrl'):
             self._ctrl_down = True
-        elif (multi and 'ctrl' in modifiers and text in ('a', 'A')
-              and text not in keys):
+        elif (multi and 'ctrl' in modifiers and text in ('a', 'A') and
+              text not in keys):
             sister_nodes = self.get_selectable_nodes()
             select = self.select_node
             for node in sister_nodes:
@@ -433,7 +454,7 @@ class CompoundSelectionBehavior(object):
         'down': uc, 'right': rc, 'left': -rc, 'scrollup': sc,
         'scrolldown': -sc, 'scrollright': -sc, 'scrollleft': sc}
 
-    def _reslove_last_node(self):
+    def _resolve_last_node(self):
         # for offset selection, we have a anchor, and we select everything
         # between anchor and added offset relative to last node
         sister_nodes = self.get_selectable_nodes()

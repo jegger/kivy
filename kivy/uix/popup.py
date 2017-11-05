@@ -58,6 +58,31 @@ can directly bind the function to an action, e.g. to a button's on_press::
     # open the popup
     popup.open()
 
+Same thing in KV language only with :class:`Factory`:
+
+.. code-block:: kv
+
+    #:import Factory kivy.factory.Factory
+    <MyPopup@Popup>:
+        auto_dismiss: False
+        Button:
+            text: 'Close me!'
+            on_release: root.dismiss()
+
+    Button:
+        text: 'Open popup'
+        on_release: Factory.MyPopup().open()
+
+.. note::
+
+    Popup is a special widget. Don't try to add it as a child to any other
+    widget. If you do, Popup will be handled like an ordinary widget and
+    won't be created hidden in the background.
+
+    .. code-block:: kv
+
+        BoxLayout:
+            MyPopup:  # bad!
 
 Popup Events
 ------------
@@ -78,6 +103,7 @@ popup from closing by explictly returning True from your callback::
 
 __all__ = ('Popup', 'PopupException')
 
+from kivy.core.text import DEFAULT_FONT
 from kivy.uix.modalview import ModalView
 from kivy.properties import (StringProperty, ObjectProperty, OptionProperty,
                              NumericProperty, ListProperty)
@@ -118,8 +144,8 @@ class Popup(ModalView):
     defaults to '14sp'.
     '''
 
-    title_align = OptionProperty('left',
-                                 options=['left', 'center', 'right', 'justify'])
+    title_align = OptionProperty(
+        'left', options=['left', 'center', 'right', 'justify'])
     '''Horizontal alignment of the title.
 
     .. versionadded:: 1.9.0
@@ -128,13 +154,14 @@ class Popup(ModalView):
     defaults to 'left'. Available options are left, center, right and justify.
     '''
 
-    title_font = StringProperty('Roboto')
+    title_font = StringProperty(DEFAULT_FONT)
     '''Font used to render the title text.
 
     .. versionadded:: 1.9.0
 
     :attr:`title_font` is a :class:`~kivy.properties.StringProperty` and
-    defaults to 'Roboto'.
+    defaults to 'Roboto'. This value is taken
+    from :class:`~kivy.config.Config`.
     '''
 
     content = ObjectProperty(None)

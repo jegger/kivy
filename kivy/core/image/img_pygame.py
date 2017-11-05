@@ -60,12 +60,12 @@ class ImageLoaderPygame(ImageLoaderBase):
             if im is None:
                 im = pygame.image.load(filename)
         except:
-            #Logger.warning(type(filename)('Image: Unable to load image <%s>')
+            # Logger.warning(type(filename)('Image: Unable to load image <%s>')
             #               % filename)
             raise
 
         fmt = ''
-        if im.get_bytesize() == 3:
+        if im.get_bytesize() == 3 and not im.get_colorkey():
             fmt = 'rgb'
         elif im.get_bytesize() == 4:
             fmt = 'rgba'

@@ -2,7 +2,7 @@
 RecycleBoxLayout
 ================
 
-.. versionadded:: 1.9.2
+.. versionadded:: 1.10.0
 
 .. warning::
     This module is highly experimental, its API may change in the future and
@@ -91,7 +91,7 @@ class RecycleBoxLayout(RecycleLayout, BoxLayout):
                         xo = posx - (w / 2.)
                 opt['pos'] = [xo, yo]
 
-        return relayout
+        return False
 
     def compute_layout(self, data, flags):
         super(RecycleBoxLayout, self).compute_layout(data, flags)

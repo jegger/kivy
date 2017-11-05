@@ -2,7 +2,7 @@
 RecycleLayout
 =============
 
-.. versionadded:: 1.9.2
+.. versionadded:: 1.10.0
 
 .. warning::
     This module is highly experimental, its API may change in the future and
@@ -18,6 +18,9 @@ __all__ = ('RecycleLayout', )
 
 
 class RecycleLayout(RecycleLayoutManagerBehavior, Layout):
+    """
+    RecycleLayout provides the default layout for RecycleViews.
+    """
 
     default_size = ObjectProperty((100, 100))
     '''size as in w, h. They each can be None.
@@ -88,10 +91,10 @@ class RecycleLayout(RecycleLayoutManagerBehavior, Layout):
                 return
             opt = self.view_opts[idx]
             if (instance.size == opt['size'] and
-                instance.size_hint == opt['size_hint'] and
-                instance.size_hint_min == opt['size_hint_min'] and
-                instance.size_hint_max == opt['size_hint_max'] and
-                instance.pos_hint == opt['pos_hint']):
+                    instance.size_hint == opt['size_hint'] and
+                    instance.size_hint_min == opt['size_hint_min'] and
+                    instance.size_hint_max == opt['size_hint_max'] and
+                    instance.pos_hint == opt['pos_hint']):
                 return
             self._size_needs_update = True
             rv.refresh_from_layout(view_size=True)
@@ -117,7 +120,7 @@ class RecycleLayout(RecycleLayoutManagerBehavior, Layout):
                         opts.insert(v, None)
                     elif k == 'modified':
                         start, stop, step = v.start, v.stop, v.step
-                        r = range (start, stop) if step == None else \
+                        r = range(start, stop) if step is None else \
                             range(start, stop, step)
                         for i in r:
                             opts[i] = None
@@ -262,10 +265,10 @@ class RecycleLayout(RecycleLayoutManagerBehavior, Layout):
         for index, widget in new:
             opt = view_opts[index]
             if (changed or widget.size == opt['size'] and
-                widget.size_hint == opt['size_hint'] and
-                widget.size_hint_min == opt['size_hint_min'] and
-                widget.size_hint_max == opt['size_hint_max'] and
-                widget.pos_hint == opt['pos_hint']):
+                    widget.size_hint == opt['size_hint'] and
+                    widget.size_hint_min == opt['size_hint_min'] and
+                    widget.size_hint_max == opt['size_hint_max'] and
+                    widget.pos_hint == opt['pos_hint']):
                 continue
             changed = True
 

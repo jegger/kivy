@@ -284,9 +284,9 @@ The currently implemented Pause mechanism is:
        System due to the user switching to another application, a phone
        shutdown or any other reason.
     #. :meth:`App.on_pause` is called:
-    #. If False is returned (default case), then :meth:`App.on_stop` is
-       called.
-    #. Otherwise the application will sleep until the OS resumes our App
+    #. If False is returned, then :meth:`App.on_stop` is called.
+    #. If True is returned (default case), the application will sleep until
+       the OS resumes our App.
     #. When the app is resumed, :meth:`App.on_resume` is called.
     #. If our app memory has been reclaimed by the OS, then nothing will be
        called.
@@ -366,8 +366,8 @@ class App(EventDispatcher):
     .. versionadded:: 1.0.5
 
     .. versionchanged:: 1.8.0
-        `title` is now a :class:`~kivy.properties.StringProperty`. Don't set the
-        title in the class as previously stated in the documentation.
+        `title` is now a :class:`~kivy.properties.StringProperty`. Don't
+        set the title in the class as previously stated in the documentation.
 
     .. note::
 
@@ -385,8 +385,8 @@ class App(EventDispatcher):
 
     icon = StringProperty(None)
     '''Icon of your application.
-    The icon can be located in the same directory as your main file. You can set
-    this as follows::
+    The icon can be located in the same directory as your main file. You can
+    set this as follows::
 
         class MyApp(App):
             def build(self):
@@ -405,10 +405,10 @@ class App(EventDispatcher):
             class MyApp(App):
                 icon = 'customicon.png'
 
-         Recommended 256x256 or 1024x1024? for GNU/Linux and Mac OSX
-         32x32 for Windows7 or less. <= 256x256 for windows 8
-         256x256 does work (on Windows 8 at least), but is scaled
-         down and doesn't look as good as a 32x32 icon.
+        Recommended 256x256 or 1024x1024? for GNU/Linux and Mac OSX
+        32x32 for Windows7 or less. <= 256x256 for windows 8
+        256x256 does work (on Windows 8 at least), but is scaled
+        down and doesn't look as good as a 32x32 icon.
     '''
 
     use_kivy_settings = True
@@ -435,8 +435,8 @@ class App(EventDispatcher):
 
     :attr:`~App.settings_cls` is an :class:`~kivy.properties.ObjectProperty`
     and defaults to :class:`~kivy.uix.settings.SettingsWithSpinner` which
-    displays settings panels with a spinner to switch between them. If you set a
-    string, the :class:`~kivy.factory.Factory` will be used to resolve the
+    displays settings panels with a spinner to switch between them. If you set
+    a string, the :class:`~kivy.factory.Factory` will be used to resolve the
     class.
 
     '''
@@ -463,7 +463,8 @@ class App(EventDispatcher):
     # Return the current running App instance
     _running_app = None
 
-    __events__ = ('on_start', 'on_stop', 'on_pause', 'on_resume')
+    __events__ = ('on_start', 'on_stop', 'on_pause', 'on_resume',
+                  'on_config_change', )
 
     def __init__(self, **kwargs):
         App._running_app = self
@@ -859,15 +860,17 @@ class App(EventDispatcher):
     def on_pause(self):
         '''Event handler called when Pause mode is requested. You should
         return True if your app can go into Pause mode, otherwise
-        return False and your application will be stopped (the default).
+        return False and your application will be stopped.
 
         You cannot control when the application is going to go into this mode.
         It's determined by the Operating System and mostly used for mobile
         devices (android/ios) and for resizing.
 
-        The default return value is False.
+        The default return value is True.
 
         .. versionadded:: 1.1.0
+        .. versionchanged:: 1.10.0
+            The default return value is now True.
         '''
         return True
 
@@ -896,6 +899,9 @@ class App(EventDispatcher):
     def on_config_change(self, config, section, key, value):
         '''Event handler fired when a configuration token has been changed by
         the settings page.
+
+        .. versionchanged:: 1.10.1
+           Added corresponding ``on_config_change`` event.
         '''
         pass
 
@@ -1015,7 +1021,7 @@ class App(EventDispatcher):
     #
 
     def _on_config_change(self, *largs):
-        self.on_config_change(*largs[1:])
+        self.dispatch('on_config_change', *largs[1:])
 
     def _install_settings_keys(self, window):
         window.bind(on_keyboard=self._on_keyboard_settings)
@@ -1044,4 +1050,3 @@ class App(EventDispatcher):
     def on_icon(self, instance, icon):
         if self._app_window:
             self._app_window.set_icon(self.get_application_icon())
-

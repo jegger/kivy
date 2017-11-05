@@ -101,7 +101,7 @@ class BoxLayout(Layout):
     minimum_width = NumericProperty(0)
     '''Automatically computed minimum width needed to contain all children.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
 
     :attr:`minimum_width` is a :class:`~kivy.properties.NumericProperty` and
     defaults to 0. It is read only.
@@ -110,7 +110,7 @@ class BoxLayout(Layout):
     minimum_height = NumericProperty(0)
     '''Automatically computed minimum height needed to contain all children.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
 
     :attr:`minimum_height` is a :class:`~kivy.properties.NumericProperty` and
     defaults to 0. It is read only.
@@ -119,14 +119,13 @@ class BoxLayout(Layout):
     minimum_size = ReferenceListProperty(minimum_width, minimum_height)
     '''Automatically computed minimum size needed to contain all children.
 
-    .. versionadded:: 1.9.2
+    .. versionadded:: 1.10.0
 
     :attr:`minimum_size` is a
     :class:`~kivy.properties.ReferenceListProperty` of
     (:attr:`minimum_width`, :attr:`minimum_height`) properties. It is read
     only.
     '''
-
 
     def __init__(self, **kwargs):
         super(BoxLayout, self).__init__(**kwargs)
@@ -200,7 +199,6 @@ class BoxLayout(Layout):
                     minimum_size_x = max(minimum_size_x, w)
                 elif shw_min:
                     minimum_size_x = max(minimum_size_x, shw_min)
-
 
             minimum_size_y = minimum_size_bounded + minimum_size_none
             minimum_size_x += padding_x

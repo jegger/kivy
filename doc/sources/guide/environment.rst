@@ -21,14 +21,11 @@ Path control
 
 .. versionadded:: 1.0.7
 
-You can control the default directories where config files, modules,
-extensions, and kivy data are located.
+You can control the default directories where config files, modules
+and kivy data are located.
 
 KIVY_DATA_DIR
     Location of the Kivy data, defaults to `<kivy path>/data`
-
-KIVY_EXTS_DIR
-    Location of the Kivy extensions, defaults to `<kivy path>/extensions`
 
 KIVY_MODULES_DIR
     Location of the Kivy modules, defaults to `<kivy path>/modules`
@@ -105,12 +102,12 @@ KIVY_TEXT
 KIVY_VIDEO
     Implementation to use for rendering video
 
-    Values: pygst, gstplayer, pyglet, ffpyplayer, ffmpeg, gi, null
+    Values: gstplayer, ffpyplayer, ffmpeg, null
 
 KIVY_AUDIO
     Implementation to use for playing audio
 
-    Values: sdl2, gstplayer, pygst, ffpyplayer, pygame, gi, avplayer
+    Values: sdl2, gstplayer, ffpyplayer, pygame, avplayer
 
 KIVY_IMAGE
     Implementation to use for reading image
@@ -120,7 +117,7 @@ KIVY_IMAGE
 KIVY_CAMERA
     Implementation to use for reading camera
 
-    Values: videocapture, avfoundation, pygst, opencv
+    Values: avfoundation, android, opencv
 
 KIVY_SPELLING
     Implementation to use for spelling
@@ -154,6 +151,15 @@ KIVY_METRICS_FONTSCALE
 Graphics
 --------
 
+KIVY_GL_BACKEND
+    The OpenGL backend to use. See :mod:`~kivy.graphics.cgl`.
+
+KIVY_GL_DEBUG
+    Whether to log OpenGL calls. See :mod:`~kivy.graphics.cgl`.
+
+KIVY_GRAPHICS
+    Whether to use OpenGL ES2. See :mod:`~kivy.graphics.cgl`.
+
 KIVY_GLES_LIMITS
     Whether the GLES2 restrictions are enforced (the default, or if set to
     1). If set to false, Kivy will not be truly GLES2 compatible.
@@ -186,3 +192,8 @@ KIVY_BCM_DISPMANX_ID
     - 4: DISPMANX_ID_FORCE_LCD
     - 5: DISPMANX_ID_FORCE_TV
     - 6: DISPMANX_ID_FORCE_OTHER
+
+KIVY_BCM_DISPMANX_LAYER
+    Change the default Raspberry Pi dispmanx layer. Default value is 0.
+ 
+    .. versionadded:: 1.10.1

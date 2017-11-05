@@ -53,7 +53,6 @@ Please refer to the installation instructions for your specific platform:
     installation-linux
     installation-android
     installation-rpi
-    troubleshooting-osx
 
 
 .. _installation_devel:
@@ -93,6 +92,12 @@ For Ubuntu 15.04 and versions older than 12.04, this one should work::
     $ sudo apt-get install python-setuptools python-pygame python-opengl \
       python-gst0.10 python-enchant gstreamer0.10-plugins-good python-dev \
       build-essential libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev python-pip
+
+For Ubuntu 16.04::
+
+    $ sudo apt-get install python-setuptools python-pygame python-opengl \
+      python-gst0.10 python-enchant gstreamer0.10-plugins-good python-dev \
+      build-essential python-pip libgl1-mesa-dev libgles2-mesa-dev zlib1g-dev
 
 Kivy requires a recent version of Cython, so it's better to use the latest
 supported version from pypi:

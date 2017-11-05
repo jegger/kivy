@@ -17,7 +17,14 @@ Manual installation (On Raspbian Jessie)
        pkg-config libgl1-mesa-dev libgles2-mesa-dev \
        python-setuptools libgstreamer1.0-dev git-core \
        gstreamer1.0-plugins-{bad,base,good,ugly} \
-       gstreamer1.0-{omx,alsa} python-dev cython
+       gstreamer1.0-{omx,alsa} python-dev libmtdev-dev \
+       xclip
+
+#. Install a new enough version of Cython:
+
+   .. parsed-literal::
+
+       sudo pip install -U |cython_install|
 
 
 #. Install Kivy globally on your system::
@@ -29,11 +36,11 @@ Manual installation (On Raspbian Jessie)
 
     git clone https://github.com/kivy/kivy
     cd kivy
-    
+
     make
     echo "export PYTHONPATH=$(pwd):\$PYTHONPATH" >> ~/.profile
     source ~/.profile
-    
+
 
 Manual installation (On Raspbian Wheezy)
 ----------------------------------------
@@ -61,9 +68,9 @@ Manual installation (On Raspbian Wheezy)
     wget https://raw.github.com/pypa/pip/master/contrib/get-pip.py
     sudo python get-pip.py
 
-#. Install Cython from sources (debian package are outdated)::
+#. Install Cython from sources (debian packages are outdated)::
 
-    sudo pip install cython
+    sudo pip install Cython==0.26.1
 
 #. Install Kivy globally on your system::
 
@@ -73,7 +80,7 @@ Manual installation (On Raspbian Wheezy)
 
     git clone https://github.com/kivy/kivy
     cd kivy
-    
+
     make
     echo "export PYTHONPATH=$(pwd):\$PYTHONPATH" >> ~/.profile
     source ~/.profile

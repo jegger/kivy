@@ -93,6 +93,7 @@ def send_report(dict_report):
 # Start output debugging
 # ----------------------------------------------------------
 
+
 title('Global')
 report.append('OS platform     : %s | %s' % (plf.platform(), plf.machine()))
 report.append('Python EXE      : %s' % sys.executable)
@@ -145,25 +146,23 @@ title('Libraries')
 
 def testimport(libname):
     try:
-        l = __import__(libname)
-        report.append('%-20s exist at %s' % (libname, l.__file__))
+        lib = __import__(libname)
+        report.append('%-20s exist at %s' % (libname, lib.__file__))
     except ImportError:
         report.append('%-20s is missing' % libname)
 
-for x in (
-    'gst',
-    'pygame',
-    'pygame.midi',
-    'pyglet',
-    'videocapture',
-    'squirtle',
-    'PIL',
-    'sdl2',
-    'glew',
-    'opencv',
-    'opencv.cv',
-    'opencv.highgui',
-    'cython'):
+
+for x in ('gst',
+          'pygame',
+          'pygame.midi',
+          'squirtle',
+          'PIL',
+          'sdl2',
+          'glew',
+          'opencv',
+          'opencv.cv',
+          'opencv.highgui',
+          'cython'):
     testimport(x)
 report_dict['Libraries'] = report
 report = []
@@ -207,8 +206,8 @@ print('\n'.join(report_dict['Global'] + report_dict['OpenGL'] +
                 report_dict['Configuration'] +
                 report_dict['InputAvailablity'] +
                 report_dict['Environ'] + report_dict['Options']))
-print()
-print()
+print('\n')
+print('\n')
 
 try:
     print('The report will be sent as an anonymous gist.')
@@ -222,11 +221,11 @@ if reply.lower().strip() in ('', 'y'):
 
     paste_url = send_report(report_dict)
 
-    print()
-    print()
+    print('\n')
+    print('\n')
     print('REPORT posted at %s' % paste_url)
-    print()
-    print()
+    print('\n')
+    print('\n')
 else:
     print('No report posted.')
 

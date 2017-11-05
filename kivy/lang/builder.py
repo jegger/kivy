@@ -66,12 +66,12 @@ def custom_callback(__kvlang__, idmap, *largs, **kwargs):
 
 def call_fn(args, instance, v):
     element, key, value, rule, idmap = args
-    if __debug__:
+    if __debug__ and not environ.get('KIVY_UNITTEST_NOBUILDERTRACE'):
         trace('Lang: call_fn %s, key=%s, value=%r, %r' % (
             element, key, value, rule.value))
     rule.count += 1
     e_value = eval(value, idmap)
-    if __debug__:
+    if __debug__ and not environ.get('KIVY_UNITTEST_NOBUILDERTRACE'):
         trace('Lang: call_fn => value=%r' % (e_value, ))
     setattr(element, key, e_value)
 
@@ -283,7 +283,7 @@ class BuilderBase(object):
                 widget inside the definition.
         '''
         filename = resource_find(filename) or filename
-        if __debug__:
+        if __debug__ and not environ.get('KIVY_UNITTEST_NOBUILDERTRACE'):
             trace('Lang: load file %s' % filename)
         with open(filename, 'r') as fd:
             kwargs['filename'] = filename
@@ -312,6 +312,7 @@ class BuilderBase(object):
             template invocation.
         '''
         # remove rules and templates
+        filename = resource_find(filename) or filename
         self.rules = [x for x in self.rules if x[1].ctx.filename != filename]
         self._clear_matchcache()
         templates = {}
@@ -319,6 +320,7 @@ class BuilderBase(object):
             if y[2] != filename:
                 templates[x] = y
         self.templates = templates
+
         if filename in self.files:
             self.files.remove(filename)
 
@@ -417,7 +419,7 @@ class BuilderBase(object):
         '''Search all the rules that match `rule_name` widget
         and apply them to `widget`.
 
-        .. versionadded:: 1.9.2
+        .. versionadded:: 1.10.0
 
         `ignored_consts` is a set or list type whose elements are property
         names for which constant KV rules (i.e. those that don't create
@@ -425,7 +427,7 @@ class BuilderBase(object):
         constant rules that overwrite a value initialized in python.
         '''
         rules = self.match_rule_name(rule_name)
-        if __debug__:
+        if __debug__ and not environ.get('KIVY_UNITTEST_NOBUILDERTRACE'):
             trace('Lang: Found %d rules for %s' % (len(rules), rule_name))
         if not rules:
             return
@@ -441,7 +443,7 @@ class BuilderBase(object):
         constant rules that overwrite a value initialized in python.
         '''
         rules = self.match(widget)
-        if __debug__:
+        if __debug__ and not environ.get('KIVY_UNITTEST_NOBUILDERTRACE'):
             trace('Lang: Found %d rules for %s' % (len(rules), widget))
         if not rules:
             return
@@ -595,11 +597,11 @@ class BuilderBase(object):
                             rctx['ids'])
                         # if there's a rule
                         if (widget_set != widget or bound or
-                            key not in ignored_consts):
+                                key not in ignored_consts):
                             setattr(widget_set, key, value)
                     else:
                         if (widget_set != widget or
-                            key not in ignored_consts):
+                                key not in ignored_consts):
                             setattr(widget_set, key, value)
 
         except Exception as e:
@@ -707,25 +709,25 @@ class BuilderBase(object):
 
         .. code-block:: python
 
-                >>> w = Builder.load_string(\'''
-                ... Widget:
-                ...     height: self.width / 2. if self.disabled else self.width
-                ...     x: self.y + 50
-                ... \''')
-                >>> w.size
-                [100, 100]
-                >>> w.pos
-                [50, 0]
-                >>> w.width = 500
-                >>> w.size
-                [500, 500]
-                >>> Builder.unbind_widget(w.uid)
-                >>> w.width = 222
-                >>> w.y = 500
-                >>> w.size
-                [222, 500]
-                >>> w.pos
-                [50, 500]
+            >>> w = Builder.load_string(\'''
+            ... Widget:
+            ...     height: self.width / 2. if self.disabled else self.width
+            ...     x: self.y + 50
+            ... \''')
+            >>> w.size
+            [100, 100]
+            >>> w.pos
+            [50, 0]
+            >>> w.width = 500
+            >>> w.size
+            [500, 500]
+            >>> Builder.unbind_widget(w.uid)
+            >>> w.width = 222
+            >>> w.y = 500
+            >>> w.size
+            [222, 500]
+            >>> w.pos
+            [50, 500]
 
         .. versionadded:: 1.7.2
         '''
@@ -827,6 +829,7 @@ class BuilderBase(object):
                 raise BuilderException(
                     prule.ctx, prule.line,
                     '{}: {}'.format(e.__class__.__name__, e), cause=tb)
+
 
 #: Main instance of a :class:`BuilderBase`.
 Builder = register_context('Builder', BuilderBase)

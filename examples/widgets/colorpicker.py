@@ -120,7 +120,7 @@ def calculate_points(x1, y1, x2, y2, steps=5):
     dy = y2 - y1
     dist = sqrt(dx * dx + dy * dy)
     if dist < steps:
-        return None
+        return
     o = []
     m = dist / steps
     for i in range(1, int(m)):
@@ -148,7 +148,7 @@ class Picture(Scatter):
     def on_touch_down(self, touch):
         _app = self._app
         if (_app.color_mode[0] == 'c' or
-            not self.collide_point(*touch.pos)):
+                not self.collide_point(*touch.pos)):
             return super(Picture, self).on_touch_down(touch)
         ud = touch.ud
         ud['group'] = g = str(touch.uid)
@@ -228,6 +228,7 @@ class MainApp(App):
     def handle_clear(self):
         if self.current_image:
             self.current_image.canvas.after.clear()
+
 
 if __name__ == '__main__':
     MainApp().run()

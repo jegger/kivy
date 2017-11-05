@@ -53,6 +53,7 @@ class LinuxWacomMotionEvent(MotionEvent):
         return '<LinuxWacomMotionEvent id=%d pos=(%f, %f) device=%s>' \
             % (self.id, self.sx, self.sy, self.device)
 
+
 if 'KIVY_DOC' in os.environ:
     # documentation hack
     LinuxWacomMotionEventProvider = None
@@ -146,7 +147,7 @@ else:
             if not args:
                 Logger.error('LinuxWacom: No filename given in config')
                 Logger.error('LinuxWacom: Use /dev/input/event0 for example')
-                return None
+                return
 
             # read filename
             self.input_fn = args[0]
@@ -343,7 +344,7 @@ else:
                                 and not reset_touch:
                             del l_points[touch_id]
                         if changed:
-                            if not 'x' in p:
+                            if 'x' not in p:
                                 reset_touch = False
                                 continue
                             process(l_points)
